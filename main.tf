@@ -8,6 +8,7 @@ terraform {
 }
 
 
+
 provider "docker" {}
 
 resource "docker_image" "nodered_image" {
@@ -15,12 +16,12 @@ resource "docker_image" "nodered_image" {
 }
 
 resource "docker_container" "nodered_container" {
-  count = 2
+  count = var.container_count
   name  = join("-",["nodered", random_string.random[count.index].result])
   image = docker_image.nodered_image.latest
   ports {
-    internal = 1880
-  # external = 1880
+    internal = var.int_port
+    #external = var.ext_port
   }
 }
 
@@ -29,15 +30,4 @@ resource "random_string" "random" {
   length = 4
   special = false
   upper = false
-}
-
-
-output "container-name" {
-  value = docker_container.nodered_container[*].name
-  description = "The name of the container"
-}
-
-output "ip-address2" {
-  value = [for i in docker_container.nodered_container[*] : join(":", [i.ip_address], i.ports[*]["external"])]
-  description = "The ip address and external port of the container"
 }
