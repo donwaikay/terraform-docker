@@ -5,12 +5,24 @@
 #   default = "dev"
 # }
 
+# variable "prod" { 
+#   type = string
+#   description = "Env to deploy to"
+#   default = "prod"
+# }
+
 variable "image" { 
   type = map
   description = "image for container"
   default = { 
+  nodered = {
     dev = "nodered/node-red:latest"
     prod = "nodered/node-red:latest-minimal"
+  }
+  influxdb = { 
+    dev = "quay.io/influxdb/influxdb:v2.0.2"
+    prod = "quay.io/influxdb/influxdb:v2.0.2"
+    }
   }
 }
 
@@ -36,7 +48,4 @@ variable "int_port" {
     condition = var.int_port == 1880
     error_message = "The internal port must be 1880."
   }
-}
-locals { 
-  container_count = length(lookup(var.ext_port, terraform.workspace))
 }
